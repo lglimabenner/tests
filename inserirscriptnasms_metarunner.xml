@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<meta-runner name="Inserir Script na SMS">
+  <description>Inserir o Script gerado pelo builder no Siscon</description>
+  <settings>
+    <build-runners>
+      <runner name="Inserir Script na SMS" type="simpleRunner">
+        <parameters>
+          <param name="command.executable" value="%orquestrador%" />
+          <param name="command.parameters" value="-acao INCLUIR_SCRIPT_SISCON" />
+          <param name="teamcity.step.mode" value="default" />
+        </parameters>
+      </runner>
+    </build-runners>
+    <requirements />
+  </settings>
+</meta-runner>

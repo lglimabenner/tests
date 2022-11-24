@@ -1,0 +1,42 @@
+def CUSTOMWS = "C:/CA"
+
+pipeline {
+    agent {
+        label {
+            label "master"
+            customWorkspace "${CUSTOMWS}"
+        }
+    } 
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '3'))
+        timeout(time: 7, unit: 'HOURS')
+    }
+
+    environment {
+		orquestrador = "${env.Orquestrador}"
+	}
+    stages{
+        stage('Donwload'){
+            steps{
+                script{
+
+                    stdout = bat(script: "%orquestrador% -acao CLONE_ALL_REPOSITORIES", returnStdout:true).trim()
+					result = stdout.readLines().drop(2).join(" ")  
+					dadosPull = readJSON text: result;
+
+                    for (index = 0; index < dadosPull.size(); index++)
+                    {
+                        def url = dadosPull[index]['Url']
+                        def nome = dadosPull[index]['Nome']
+                        def branch = dadosPull[index]['BranchDefault']
+                        echo "${url}";
+                        echo "${nome}";
+                        echo "${branch}";
+
+                        checkout([$class: 'GitSCM', branches: [[name: "*/${branch}"]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: nome], [$class: 'CheckoutOption', timeout: 100]], submoduleCfg: [], userRemoteConfigs: [[url: url]]])
+                    }                
+                }
+            }
+        }
+    }
+}
